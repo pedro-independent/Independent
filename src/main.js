@@ -154,7 +154,6 @@ containers.forEach(container => {
     resizeObserver.observe(container);
 });
 
-
 /* End of Three.js */
 
 /* Check section for navbar color change */
@@ -469,26 +468,49 @@ function initImageTrail(config = {}) {
   function activate(trailImage, x, y) {
     if (!trailImage) return;
 
+    // Define how far the image will drift away from the cursor
+    const PUSH_AMOUNT = 100; // You can adjust this value
+
+    // --- Calculate direction ---
+    const dx = x - state.last.x;
+    const dy = y - state.last.y;
+    const distance = Math.hypot(dx, dy);
+    const directionX = distance > 0 ? dx / distance : 0;
+    const directionY = distance > 0 ? dy / distance : 0;
+    // --- End calculation ---
+
     const rect = trailImage.getBoundingClientRect();
     const styles = {
       left: `${x - rect.width / 2}px`,
       top: `${y - rect.height / 2}px`,
       zIndex: state.globalIndex,
-      display: 'block'
+      //display: 'block'
     };
 
     Object.assign(trailImage.style, styles);
     state.trailImageTimestamps.set(trailImage, Date.now());
 
-	// Here, animate how the images will appear!
+    // Here, animate how the images will appear!
     gsap.fromTo(
       trailImage,
-      { autoAlpha: 0, scale: 0.8 },
-      {
+      { // FROM state
+        autoAlpha: 0,
+        scale: 0,
+        rotation: 0,
+        x: 0,
+        y: 0
+      },
+      { // TO state
         scale: 1,
         autoAlpha: 1,
-        duration: 0.2,
-        overwrite: true
+        duration: 0.8,
+        rotation: (Math.random() - 0.5) * 40,
+        //rotation: -12,
+        ease: "expo.out",
+        overwrite: true,
+        // Add the drift animation
+        x: directionX * PUSH_AMOUNT,
+        y: directionY * PUSH_AMOUNT
       }
     );
 
@@ -497,12 +519,12 @@ function initImageTrail(config = {}) {
 
   function fadeOutTrailImage(trailImage) {
     if (!trailImage) return;
-		
+    
     // Here, animate how the images will disappear!
     gsap.to(trailImage, {
       opacity: 0,
       scale: 0.2,
-      duration: 0.8,
+      duration: 0.6,
       ease: "expo.out",
       onComplete: () => {
         gsap.set(trailImage, { autoAlpha: 0 });
@@ -596,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const imageTrail = initImageTrail({
     minWidth: 992,
     moveDistance: 15,
-    stopDuration: 350,
+    stopDuration: 800,
     trailLength: 8
   });
 });
