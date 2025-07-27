@@ -1,7 +1,7 @@
 import './styles/style.css'
 import * as THREE from 'three'
 
-gsap.registerPlugin(ScrollTrigger, Flip);
+gsap.registerPlugin(ScrollTrigger, Flip, ScrambleTextPlugin, SplitText);
 
 //console.log(THREE)
 
@@ -245,6 +245,72 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
 });
 
+/* Scramble Hover Buttons */
+// function initScrambleOnHover() {
+//   let targets = document.querySelectorAll('[data-scramble-hover="link"]');
+
+//   targets.forEach((target) => {
+//     let textEl = target.querySelector('[data-scramble-hover="target"]');
+//     if (!textEl) return;
+
+//     // Save original text for fallback
+//     let originalText = textEl.textContent;
+//     let customHoverText = textEl.getAttribute("data-scramble-text");
+
+//     // Prepare split
+//     let split = new SplitText(textEl, {
+//       type: "words, chars",
+//       wordsClass: "word",
+//       charsClass: "char"
+//     });
+
+// target.addEventListener("mouseenter", () => {
+//   split.split(); // Re-split in case of revert
+
+//   const scrambleText = customHoverText || originalText;
+
+//   // Truncate or pad scrambleText to match original length
+//   const sameLengthText = scrambleText
+//     .padEnd(originalText.length, " ") // pad if shorter
+//     .slice(0, originalText.length);   // cut if longer
+
+//   gsap.to(split.words, {
+//     duration: 1.2,
+//     stagger: 0.01,
+//     scrambleText: {
+//       text: sameLengthText,
+//       chars: "upperCase",
+//       speed: 0.85
+//     },
+//     onComplete: () => split.revert()
+//   });
+// });
+
+
+//     target.addEventListener("mouseleave", () => {
+//       // Re-split again for leave animation
+//       split.split();
+
+//       gsap.to(split.words, {
+//         duration: 0.8,
+//         stagger: 0.01,
+//         scrambleText: {
+//           text: originalText,
+//           chars: "upperCase",
+//           speed: 0.85
+//         },
+//         onComplete: () => split.revert()
+//       });
+//     });
+//   });
+// }
+
+
+// // Initialize Scramble Functions
+// document.addEventListener("DOMContentLoaded", () => {
+//   initScrambleOnHover();
+// });
+
 /* Scaling Video on Scroll */
 function initFlipOnScroll() {
   let wrapperElements = document.querySelectorAll("[data-flip-element='wrapper']");
@@ -304,35 +370,36 @@ function initFlipOnScroll() {
 initFlipOnScroll();
 
 /* About images reveal */
-const images = gsap.utils.toArray('.about-img');
-const imagesToAnimate = images.slice(1);
+// const images = gsap.utils.toArray('.about-img');
+// const imagesToAnimate = images.slice(1);
 
-const timeline = gsap.timeline({
-  scrollTrigger: {
-    trigger: ".about-container",
-    start: "15% center",
-    end: "bottom center",
-    toggleActions: "play reverse play reverse",
-  }
-});
+// const timeline = gsap.timeline({
+//   scrollTrigger: {
+//     trigger: ".about-container",
+//     start: "15% center",
+//     end: "bottom center",
+//     toggleActions: "play reverse play reverse",
+//   }
+// });
 
-imagesToAnimate.forEach((img, index) => {
-  const rotation = index % 2 === 0 ? 6 : -6;
+// imagesToAnimate.forEach((img, index) => {
+//   const rotation = index % 3 === 0 ? 6 : -6;
 
-  gsap.set(img, {
-    scale: 0,
-    rotate: rotation,
-    transformOrigin: "center center"
-  });
+//   gsap.set(img, {
+//     scale: 0,
+//     rotate: rotation,
+//     transformOrigin: "center center"
+//   });
 
-  timeline.to(img, {
-    scale: 1,
-    rotate: 0,
-    ease: "expo.out",
-    duration: 1
-  }, index);
-});
+//   timeline.to(img, {
+//     scale: 1,
+//     rotate: 0,
+//     ease: "expo.out",
+//     duration: 1
+//   }, index);
+// });
 
+/* Projects Video on Hover */
 function initPlayVideoHover() {
   const wrappers = document.querySelectorAll('[data-video-on-hover]');
 
@@ -469,7 +536,7 @@ function initImageTrail(config = {}) {
     if (!trailImage) return;
 
     // Define how far the image will drift away from the cursor
-    const PUSH_AMOUNT = 100; // You can adjust this value
+    const PUSH_AMOUNT = 50; // You can adjust this value
 
     // --- Calculate direction ---
     const dx = x - state.last.x;
