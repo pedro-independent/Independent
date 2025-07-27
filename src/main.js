@@ -349,7 +349,8 @@ function initFlipOnScroll() {
         tl.add(
           Flip.fit(targetEl, nextWrapperEl, {
             duration: offset,
-            ease: "none"
+            ease: "none",
+            borderRadius: 0,
           })
         );
       }
