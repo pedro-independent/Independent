@@ -435,6 +435,25 @@ function initAccordionCSS() {
   document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
     const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
 
+    const updateSiblingBorders = () => {
+      const items = Array.from(accordion.querySelectorAll('[data-accordion-status]'));
+
+      // Reset all borders
+      items.forEach(item => {
+        item.style.border = ''; // restore default CSS border
+      });
+
+      // Find the active item
+      const activeIndex = items.findIndex(
+        item => item.getAttribute('data-accordion-status') === 'active'
+      );
+
+      if (activeIndex > 0) {
+        const previousItem = items[activeIndex - 1];
+        previousItem.style.border = 'none';
+      }
+    };
+
     accordion.querySelectorAll('[data-accordion-toggle]').forEach((toggle) => {
       const singleAccordion = toggle.closest('[data-accordion-status]');
       if (!singleAccordion) return;
@@ -442,22 +461,27 @@ function initAccordionCSS() {
       toggle.addEventListener('mouseenter', () => {
         singleAccordion.setAttribute('data-accordion-status', 'active');
 
-        // Close siblings if enabled
         if (closeSiblings) {
           accordion.querySelectorAll('[data-accordion-status="active"]').forEach((sibling) => {
-            if (sibling !== singleAccordion) sibling.setAttribute('data-accordion-status', 'not-active');
+            if (sibling !== singleAccordion) {
+              sibling.setAttribute('data-accordion-status', 'not-active');
+            }
           });
         }
+
+        updateSiblingBorders();
       });
 
       toggle.addEventListener('mouseleave', () => {
         singleAccordion.setAttribute('data-accordion-status', 'not-active');
+        updateSiblingBorders();
       });
     });
   });
 }
 
 initAccordionCSS();
+
 
 function initCSSMarquee() {
   const pixelsPerSecond = 75; // Set the marquee speed (pixels per second)
