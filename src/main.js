@@ -286,58 +286,83 @@ function initCursorMarqueeEffect() {
 initCursorMarqueeEffect();
 
 /* Process Tabs */
-if (window.matchMedia('(min-width: 991px)').matches) {
 function initAccordionCSS() {
-  document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
-    const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
-
-    const updateSiblingBorders = () => {
-      const items = Array.from(accordion.querySelectorAll('[data-accordion-status]'));
-
-      // Reset all borders
-      items.forEach(item => {
-        item.style.border = ''; // restore default CSS border
-      });
-
-      // Find the active item
-      const activeIndex = items.findIndex(
-        item => item.getAttribute('data-accordion-status') === 'active'
-      );
-
-      if (activeIndex > 0) {
-        const previousItem = items[activeIndex - 1];
-        previousItem.style.border = 'none';
-      }
-    };
-
-    accordion.querySelectorAll('[data-accordion-toggle]').forEach((toggle) => {
-      const singleAccordion = toggle.closest('[data-accordion-status]');
-      if (!singleAccordion) return;
-
-      toggle.addEventListener('mouseenter', () => {
-        singleAccordion.setAttribute('data-accordion-status', 'active');
-
-        if (closeSiblings) {
-          accordion.querySelectorAll('[data-accordion-status="active"]').forEach((sibling) => {
-            if (sibling !== singleAccordion) {
-              sibling.setAttribute('data-accordion-status', 'not-active');
-            }
-          });
-        }
-
-        updateSiblingBorders();
-      });
-
-      toggle.addEventListener('mouseleave', () => {
-        singleAccordion.setAttribute('data-accordion-status', 'not-active');
-        updateSiblingBorders();
+  const applyMobileBehavior = () => {
+    document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
+      accordion.querySelectorAll('[data-accordion-status]').forEach((item) => {
+        item.setAttribute('data-accordion-status', 'active');
+        item.style.border = ''; // reset to default border
       });
     });
-  });
+  };
+
+  const applyDesktopBehavior = () => {
+    document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
+      const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
+
+      const updateSiblingBorders = () => {
+        const items = Array.from(accordion.querySelectorAll('[data-accordion-status]'));
+
+        // Reset all borders
+        items.forEach(item => {
+          item.style.border = '';
+        });
+
+        // Find the active item
+        const activeIndex = items.findIndex(
+          item => item.getAttribute('data-accordion-status') === 'active'
+        );
+
+        if (activeIndex > 0) {
+          const previousItem = items[activeIndex - 1];
+          previousItem.style.border = 'none';
+        }
+      };
+
+      accordion.querySelectorAll('[data-accordion-toggle]').forEach((toggle) => {
+        const singleAccordion = toggle.closest('[data-accordion-status]');
+        if (!singleAccordion) return;
+
+        toggle.addEventListener('mouseenter', () => {
+          singleAccordion.setAttribute('data-accordion-status', 'active');
+
+          if (closeSiblings) {
+            accordion.querySelectorAll('[data-accordion-status="active"]').forEach((sibling) => {
+              if (sibling !== singleAccordion) {
+                sibling.setAttribute('data-accordion-status', 'not-active');
+              }
+            });
+          }
+
+          updateSiblingBorders();
+        });
+
+        toggle.addEventListener('mouseleave', () => {
+          singleAccordion.setAttribute('data-accordion-status', 'not-active');
+          updateSiblingBorders();
+        });
+      });
+    });
+  };
+
+  const handleResize = () => {
+    if (window.innerWidth < 991) {
+      applyMobileBehavior();
+    } else {
+      applyDesktopBehavior();
+    }
+  };
+
+  // Run once on load
+  handleResize();
+
+  // Run on resize
+  window.addEventListener('resize', handleResize);
 }
 
 initAccordionCSS();
-}
+
+
 
 /* Marquee */
 function initCSSMarquee() {
