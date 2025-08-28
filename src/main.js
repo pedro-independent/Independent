@@ -1,9 +1,6 @@
 import './styles/style.css'
 
-
 gsap.registerPlugin(ScrollTrigger, Flip, ScrambleTextPlugin, SplitText);
-
-
 
 /* Check section for navbar color change */
 function initCheckSectionThemeScroll() {
@@ -289,6 +286,7 @@ function initCursorMarqueeEffect() {
 initCursorMarqueeEffect();
 
 /* Process Tabs */
+if (window.matchMedia('(min-width: 991px)').matches) {
 function initAccordionCSS() {
   document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
     const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
@@ -339,8 +337,9 @@ function initAccordionCSS() {
 }
 
 initAccordionCSS();
+}
 
-
+/* Marquee */
 function initCSSMarquee() {
   const pixelsPerSecond = 75; // Set the marquee speed (pixels per second)
   const marquees = document.querySelectorAll('[data-css-marquee]');
