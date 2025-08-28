@@ -215,6 +215,79 @@ function initPlayVideoHover() {
 
 initPlayVideoHover();
 
+/* Cursor */
+function initCursorMarqueeEffect() {
+  const hoverOutDelay = 0.4;
+  const followDuration = 0.6;
+  const speedMultiplier = 5;
+
+  const cursor = document.querySelector('[data-cursor-marquee-status]');
+  if (!cursor) return;
+  const targets = cursor.querySelectorAll('[data-cursor-marquee-text-target]');
+
+  const xTo = gsap.quickTo(cursor, 'x', { duration: followDuration, ease: 'power3' });
+  const yTo = gsap.quickTo(cursor, 'y', { duration: followDuration, ease: 'power3' });
+
+  let pauseTimeout = null;
+  let activeEl = null;
+  let lastX = 0;
+  let lastY = 0;
+
+  function playFor(el) {
+    if (!el) return;
+    if (pauseTimeout) clearTimeout(pauseTimeout);
+    const text = el.getAttribute('data-cursor-marquee-text') || '';
+    const sec = (text.length || 1) / speedMultiplier;
+    targets.forEach(t => {
+      t.textContent = text;
+      t.style.animationPlayState = 'running';
+      t.style.animationDuration = sec + 's';
+    });
+    cursor.setAttribute('data-cursor-marquee-status', 'active');
+    activeEl = el;
+  }
+
+  function pauseLater() {
+    cursor.setAttribute('data-cursor-marquee-status', 'not-active');
+    if (pauseTimeout) clearTimeout(pauseTimeout);
+    pauseTimeout = setTimeout(() => {
+      targets.forEach(t => {
+        t.style.animationPlayState = 'paused';
+      });
+    }, hoverOutDelay * 1000);
+    activeEl = null;
+  }
+
+  function checkTarget() {
+    const el = document.elementFromPoint(lastX, lastY);
+    const hit = el && el.closest('[data-cursor-marquee-text]');
+    if (hit !== activeEl) {
+      if (activeEl) pauseLater();
+      if (hit) playFor(hit);
+    }
+  }
+
+  window.addEventListener('pointermove', e => {
+    lastX = e.clientX;
+    lastY = e.clientY;
+    xTo(lastX);
+    yTo(lastY);
+    checkTarget();
+  }, { passive: true });
+
+  window.addEventListener('scroll', () => {
+    xTo(lastX);
+    yTo(lastY);
+    checkTarget();
+  }, { passive: true });
+
+  setTimeout(() => {
+    cursor.setAttribute('data-cursor-marquee-status', 'not-active');
+  }, 500);
+}
+
+initCursorMarqueeEffect();
+
 /* Process Tabs */
 function initAccordionCSS() {
   document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
@@ -498,3 +571,75 @@ document.addEventListener("DOMContentLoaded", () => {
     trailLength: 8
   });
 });
+
+/* Current Time */
+function initDynamicCurrentTime() {
+  const defaultTimezone = "Europe/Lisbon";
+
+  // Helper function to format numbers with leading zero
+  const formatNumber = (number) => number.toString().padStart(2, '0');
+
+  // Function to create a time formatter with the correct timezone
+  const createFormatter = (timezone) => {
+    return new Intl.DateTimeFormat([], {
+      timeZone: timezone,
+      timeZoneName: 'short',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true, // Optional: Remove to match your simpler script
+    });
+  };
+
+  // Function to parse the formatted string into parts
+  const parseFormattedTime = (formattedDateTime) => {
+    const match = formattedDateTime.match(/(\d+):(\d+):(\d+)\s*([\w+]+)/);
+    if (match) {
+      return {
+        hours: match[1],
+        minutes: match[2],
+        seconds: match[3],
+        timezone: match[4], // Handles both GMT+X and CET cases
+      };
+    }
+    return null;
+  };
+
+  // Function to update the time for all elements
+  const updateTime = () => {
+    document.querySelectorAll('[data-current-time]').forEach((element) => {
+      const timezone = element.getAttribute('data-current-time') || defaultTimezone;
+      const formatter = createFormatter(timezone);
+      const now = new Date();
+      const formattedDateTime = formatter.format(now);
+
+      const timeParts = parseFormattedTime(formattedDateTime);
+      if (timeParts) {
+        const {
+          hours,
+          minutes,
+          seconds,
+          timezone
+        } = timeParts;
+
+        // Update child elements if they exist
+        const hoursElem = element.querySelector('[data-current-time-hours]');
+        const minutesElem = element.querySelector('[data-current-time-minutes]');
+        const secondsElem = element.querySelector('[data-current-time-seconds]');
+        const timezoneElem = element.querySelector('[data-current-time-timezone]');
+
+        if (hoursElem) hoursElem.textContent = hours;
+        if (minutesElem) minutesElem.textContent = minutes;
+        if (secondsElem) secondsElem.textContent = seconds;
+        if (timezoneElem) timezoneElem.textContent = timezone;
+      }
+    });
+  };
+
+  // Initial update and interval for subsequent updates
+  updateTime();
+  setInterval(updateTime, 1000);
+}
+
+
+initDynamicCurrentTime();
