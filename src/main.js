@@ -168,36 +168,6 @@ function initFlipOnScroll() {
 
 initFlipOnScroll();
 
-/* About images reveal */
-// const images = gsap.utils.toArray('.about-img');
-// const imagesToAnimate = images.slice(1);
-
-// const timeline = gsap.timeline({
-//   scrollTrigger: {
-//     trigger: ".about-container",
-//     start: "15% center",
-//     end: "bottom center",
-//     toggleActions: "play reverse play reverse",
-//   }
-// });
-
-// imagesToAnimate.forEach((img, index) => {
-//   const rotation = index % 3 === 0 ? 6 : -6;
-
-//   gsap.set(img, {
-//     scale: 0,
-//     rotate: rotation,
-//     transformOrigin: "center center"
-//   });
-
-//   timeline.to(img, {
-//     scale: 1,
-//     rotate: 0,
-//     ease: "expo.out",
-//     duration: 1
-//   }, index);
-// });
-
 /* Projects Video on Hover */
 function initPlayVideoHover() {
   const wrappers = document.querySelectorAll('[data-video-on-hover]');
